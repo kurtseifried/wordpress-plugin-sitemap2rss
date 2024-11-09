@@ -12,13 +12,6 @@ class FeedGenerator {
         $this->validator = new Validator();
     }
 
-    /**
-     * Generate RSS feed from sitemap
-     *
-     * @param string $sitemap_url The URL of the sitemap
-     * @param string $feed_name The name of the feed
-     * @param string $self_url Optional. The self-referential URL for the feed
-     */
     public function generate($sitemap_url, $feed_name, $self_url = '') {
         try {
             $sitemap_content = $this->fetch_sitemap($sitemap_url);
@@ -141,68 +134,90 @@ class FeedGenerator {
         header('Content-Security-Policy: default-src \'none\'; frame-ancestors \'none\'');
         header('Content-Type: application/rss+xml; charset=UTF-8');
 
-        // Clear any previous output
-        if (ob_get_level()) {
-            ob_clean();
+        // Clear any previous output and turn off output buffering
+        while (ob_get_level()) {
+            ob_end_clean();
         }
 
-        echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        echo "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n";
-        echo "    <channel>\n";
-        
-        // Feed metadata with indentation
-        echo '        <title>' . esc_xml($this->xml_escape($feed_name)) . "</title>\n";
-        echo '        <link>' . esc_xml($this->xml_escape($sitemap_url)) . "</link>\n";
-        echo '        <description>' . esc_xml($this->xml_escape(
+        // Create XML document
+        $doc = new \DOMDocument('1.0', 'UTF-8');
+        $doc->formatOutput = true;
+        $doc->preserveWhiteSpace = false;
+
+        // Create RSS root element
+        $rss = $doc->createElement('rss');
+        $rss->setAttribute('version', '2.0');
+        $rss->setAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
+        $doc->appendChild($rss);
+
+        // Create channel element
+        $channel = $doc->createElement('channel');
+        $rss->appendChild($channel);
+
+        // Add channel metadata
+        $channel->appendChild($doc->createElement('title', $feed_name));
+        $channel->appendChild($doc->createElement('link', $sitemap_url));
+        $channel->appendChild($doc->createElement('description', 
             sprintf(
                 /* translators: %s: feed name */
                 __('RSS feed generated from %s', 'sitemap2rss'),
                 $feed_name
             )
-        )) . "</description>\n";
-        echo '        <language>' . esc_xml(get_bloginfo('language')) . "</language>\n";
-        echo '        <lastBuildDate>' . esc_xml(gmdate('r')) . "</lastBuildDate>\n";
-        echo '        <generator>Sitemap2RSS Converter</generator>' . "\n";
-        
-        // Add atom self link if provided
+        ));
+        $channel->appendChild($doc->createElement('language', get_bloginfo('language')));
+        $channel->appendChild($doc->createElement('lastBuildDate', gmdate('r')));
+        $channel->appendChild($doc->createElement('generator', 'Sitemap2RSS Converter'));
+
+        // Add atom:link if self_url is provided
         if (!empty($self_url)) {
-            echo '        <atom:link href="' . esc_xml($this->xml_escape($self_url)) . '" rel="self" type="application/rss+xml" />' . "\n";
+            $atom_link = $doc->createElement('atom:link');
+            $atom_link->setAttribute('href', $self_url);
+            $atom_link->setAttribute('rel', 'self');
+            $atom_link->setAttribute('type', 'application/rss+xml');
+            $channel->appendChild($atom_link);
         }
 
-        // Add items with proper indentation
+        // Add items
         foreach ($urls as $url_data) {
-            echo "        <item>\n";
-            echo '            <title>' . esc_xml($this->xml_escape($url_data['loc'])) . "</title>\n";
-            echo '            <link>' . esc_xml($this->xml_escape($url_data['loc'])) . "</link>\n";
-            echo '            <guid isPermaLink=\"true\">' . esc_xml($this->xml_escape($url_data['loc'])) . "</guid>\n";
+            $item = $doc->createElement('item');
+            
+            // Create basic elements
+            $item->appendChild($doc->createElement('title', $url_data['loc']));
+            $item->appendChild($doc->createElement('link', $url_data['loc']));
+            
+            // Create GUID with attribute
+            $guid = $doc->createElement('guid', $url_data['loc']);
+            $guid->setAttributeNodeNS($doc->createAttributeNS(null, 'isPermaLink'));
+            $guid->getAttributeNode('isPermaLink')->value = 'true';
+            $item->appendChild($guid);
             
             if (!empty($url_data['lastmod'])) {
-                echo '            <pubDate>' . esc_xml(gmdate('r', strtotime($url_data['lastmod']))) . "</pubDate>\n";
+                $item->appendChild($doc->createElement('pubDate', 
+                    gmdate('r', strtotime($url_data['lastmod']))
+                ));
             }
             
-            // Combine sitemap metadata into description
-            $description = [];
+            // Create description
+            $description_parts = [];
             if (!empty($url_data['changefreq'])) {
-                $description[] = 'Change frequency: ' . esc_html($url_data['changefreq']);
+                $description_parts[] = 'Change frequency: ' . $url_data['changefreq'];
             }
             if (!empty($url_data['priority'])) {
-                $description[] = 'Priority: ' . esc_html($url_data['priority']);
+                $description_parts[] = 'Priority: ' . $url_data['priority'];
             }
             
-            if (!empty($description)) {
-                echo '            <description><![CDATA[' . esc_xml(implode("\n", $description)) . ']]></description>' . "\n";
+            if (!empty($description_parts)) {
+                $description = $doc->createElement('description');
+                $cdata = $doc->createCDATASection(implode(' | ', $description_parts));
+                $description->appendChild($cdata);
+                $item->appendChild($description);
             }
             
-            echo "        </item>\n";
+            $channel->appendChild($item);
         }
 
-        // Close tags with proper indentation
-        echo "    </channel>\n";
-        echo "</rss>";
+        // Output with specific options
+        echo $doc->saveXML($doc->documentElement, LIBXML_NOEMPTYTAG);
         exit;
-    }
-
-    private function xml_escape($string) {
-        return htmlspecialchars($string, ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }
 }
