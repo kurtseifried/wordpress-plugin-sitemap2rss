@@ -46,7 +46,7 @@ For security reasons, sitemaps must be pre-configured through the admin interfac
 1. Admin interface for managing sitemap aliases
 2. Example of RSS output
 
-![Admin interface for managing sitemap aliases](images/sitemap2rss-setings.png)
+![Admin interface for managing sitemap aliases](images/sitemap2rss-settings.png)
 
 ![Example of RSS output](images/sitemap2rss-output.png)
 
