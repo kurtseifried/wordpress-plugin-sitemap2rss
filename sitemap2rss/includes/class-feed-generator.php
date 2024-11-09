@@ -12,8 +12,20 @@ class FeedGenerator {
         $this->validator = new Validator();
     }
 
+    /**
+     * Generate RSS feed from sitemap
+     *
+     * @param string $sitemap_url The URL of the sitemap
+     * @param string $feed_name The name of the feed
+     * @param string $self_url Optional. The self-referential URL for the feed
+     */
     public function generate($sitemap_url, $feed_name, $self_url = '') {
         try {
+            // If no self URL provided, try to get current URL
+            if (empty($self_url)) {
+                $self_url = home_url(add_query_arg(array()));
+            }
+            
             $sitemap_content = $this->fetch_sitemap($sitemap_url);
             $urls = $this->parse_sitemap($sitemap_content);
             $this->output_feed($urls, $feed_name, $sitemap_url, $self_url);
@@ -168,14 +180,12 @@ class FeedGenerator {
         $channel->appendChild($doc->createElement('lastBuildDate', gmdate('r')));
         $channel->appendChild($doc->createElement('generator', 'Sitemap2RSS Converter'));
 
-        // Add atom:link if self_url is provided
-        if (!empty($self_url)) {
-            $atom_link = $doc->createElement('atom:link');
-            $atom_link->setAttribute('href', $self_url);
-            $atom_link->setAttribute('rel', 'self');
-            $atom_link->setAttribute('type', 'application/rss+xml');
-            $channel->appendChild($atom_link);
-        }
+        // Always add atom:link with rel="self"
+        $atom_link = $doc->createElementNS('http://www.w3.org/2005/Atom', 'atom:link');
+        $atom_link->setAttribute('href', esc_url($self_url));
+        $atom_link->setAttribute('rel', 'self');
+        $atom_link->setAttribute('type', 'application/rss+xml');
+        $channel->appendChild($atom_link);
 
         // Add items
         foreach ($urls as $url_data) {
@@ -184,12 +194,7 @@ class FeedGenerator {
             // Create basic elements
             $item->appendChild($doc->createElement('title', $url_data['loc']));
             $item->appendChild($doc->createElement('link', $url_data['loc']));
-            
-            // Create GUID with attribute
-            $guid = $doc->createElement('guid', $url_data['loc']);
-            $guid->setAttributeNodeNS($doc->createAttributeNS(null, 'isPermaLink'));
-            $guid->getAttributeNode('isPermaLink')->value = 'true';
-            $item->appendChild($guid);
+            $item->appendChild($doc->createElement('guid', $url_data['loc']));
             
             if (!empty($url_data['lastmod'])) {
                 $item->appendChild($doc->createElement('pubDate', 

@@ -50,6 +50,3 @@ For security reasons, sitemaps must be pre-configured through the admin interfac
 
 ![Example of RSS output](images/sitemap2rss-output.png)
 
-## Changelog 
-
-1.0.0 - Initial release
