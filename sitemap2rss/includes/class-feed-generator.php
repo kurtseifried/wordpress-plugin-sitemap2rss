@@ -142,7 +142,11 @@ class FeedGenerator {
                 )
             );
         } finally {
-            libxml_set_external_entity_loader($prev);
+            if (is_callable($prev)) {
+                libxml_set_external_entity_loader($prev);
+            } else {
+                libxml_set_external_entity_loader(null);
+            }
             libxml_use_internal_errors(false);
         }
     }
@@ -224,7 +228,8 @@ class FeedGenerator {
 
         // Output with specific options
         $xml_output = $doc->saveXML($doc->documentElement, LIBXML_NOEMPTYTAG);
-        echo wp_kses_post($xml_output);
+        header('Content-Type: application/rss+xml; charset=UTF-8');
+        echo $xml_output;
         exit;
     }
 }

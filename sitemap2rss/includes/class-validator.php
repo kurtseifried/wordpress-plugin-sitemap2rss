@@ -89,8 +89,12 @@ class Validator {
                 ];
             }
         } finally {
-            // Restore the previous entity loader
-            libxml_set_external_entity_loader($prev);
+            // Validate $prev before restoring the entity loader
+            if (is_callable($prev) || $prev === null) {
+                libxml_set_external_entity_loader($prev);
+            } else {
+                libxml_set_external_entity_loader(null); // Safeguard to reset to default
+            }
         }
 
         return [

@@ -140,8 +140,11 @@ if (!isset($aliases) || !isset($rate_limits) || !isset($rate_limit_option)) {
                 <?php foreach ($aliases as $alias => $data) : ?>
                     <tr>
                         <td><?php echo esc_html($alias); ?></td>
-                        <td><?php echo esc_html($data['name']); ?></td>
-                        <td><?php echo esc_url($data['url']); ?></td>
+                        <td><a href="<?php echo esc_url(home_url('/sitemap2rss/' . $alias)); ?>" target="_blank"><?php echo esc_html($data['name']); ?></a></td>
+                        <td>
+                            <?php echo esc_url($data['url']); ?>
+                            <button type="button" class="button copy-url" data-url="<?php echo esc_url($data['url']); ?>"><?php esc_html_e('Copy URL', 'sitemap2rss'); ?></button>
+                        </td>
                         <td>
                             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                                 <input type="hidden" name="action" value="delete_sitemap_alias" />
@@ -160,3 +163,19 @@ if (!isset($aliases) || !isset($rate_limits) || !isset($rate_limit_option)) {
         </tbody>
     </table>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const copyButtons = document.querySelectorAll('.copy-url');
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            navigator.clipboard.writeText(url).then(() => {
+                alert('<?php esc_html_e('URL copied to clipboard', 'sitemap2rss'); ?>');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        });
+    });
+});
+</script>
