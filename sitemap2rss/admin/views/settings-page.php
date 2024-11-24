@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Ensure required variables are available
-if (!isset($aliases) || !isset($rate_limits) || !isset($this->rate_limit_option)) {
+if (!isset($aliases) || !isset($rate_limits) || !isset($rate_limit_option)) {
     wp_die(esc_html__('Invalid configuration', 'sitemap2rss'));
 }
 ?>
@@ -30,7 +30,7 @@ if (!isset($aliases) || !isset($rate_limits) || !isset($this->rate_limit_option)
                 <td>
                     <input type="number"
                            id="requests_per_minute"
-                           name="<?php echo esc_attr($this->rate_limit_option); ?>[requests_per_minute]"
+                           name="<?php echo esc_attr($rate_limit_option); ?>[requests_per_minute]"
                            value="<?php echo esc_attr($rate_limits['requests_per_minute']); ?>"
                            min="1" max="60" required 
                            class="small-text" />
@@ -48,7 +48,7 @@ if (!isset($aliases) || !isset($rate_limits) || !isset($this->rate_limit_option)
                 <td>
                     <input type="number"
                            id="minimum_interval"
-                           name="<?php echo esc_attr($this->rate_limit_option); ?>[minimum_interval]"
+                           name="<?php echo esc_attr($rate_limit_option); ?>[minimum_interval]"
                            value="<?php echo esc_attr($rate_limits['minimum_interval']); ?>"
                            min="1" max="300" required 
                            class="small-text" />

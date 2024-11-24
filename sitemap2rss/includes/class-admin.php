@@ -161,6 +161,13 @@ class Admin {
     }
 
     public function render_admin_page() {
-        include SITEMAP2RSS_PLUGIN_DIR . 'templates/admin-page.php';
+        $aliases = get_option($this->option_name, []);
+        $rate_limits = get_option($this->rate_limit_option, [
+            'requests_per_minute' => 5,
+            'minimum_interval' => 10
+        ]);
+        $rate_limit_option = $this->rate_limit_option;
+
+        include SITEMAP2RSS_PLUGIN_DIR . 'admin/views/settings-page.php';
     }
 }
