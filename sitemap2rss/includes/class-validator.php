@@ -71,7 +71,10 @@ class Validator {
         }
 
         libxml_use_internal_errors(true);
-        $prev = libxml_disable_entity_loader(true); // Security: disable external entities
+        // Use libxml_set_external_entity_loader to control external entity loading
+        $prev = libxml_set_external_entity_loader(function($public, $system, $context) {
+            return null;
+        });
 
         try {
             $xml = new \DOMDocument();
@@ -82,32 +85,17 @@ class Validator {
                 libxml_clear_errors();
                 return [
                     'valid' => false,
-                    'message' => __('Invalid XML structure', 'sitemap2rss')
+                    'message' => __('Invalid XML content', 'sitemap2rss')
                 ];
             }
-
-            // Verify it has URL elements
-            $urls = $xml->getElementsByTagName('url');
-            if ($urls->length === 0) {
-                return [
-                    'valid' => false,
-                    'message' => __('No URLs found in sitemap', 'sitemap2rss')
-                ];
-            }
-
-            return [
-                'valid' => true,
-                'message' => __('Valid sitemap content', 'sitemap2rss')
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'valid' => false,
-                'message' => __('Error processing XML content', 'sitemap2rss')
-            ];
         } finally {
-            libxml_disable_entity_loader($prev);
-            libxml_use_internal_errors(false);
+            // Restore the previous entity loader
+            libxml_set_external_entity_loader($prev);
         }
+
+        return [
+            'valid' => true,
+            'message' => __('Valid sitemap content', 'sitemap2rss')
+        ];
     }
 }

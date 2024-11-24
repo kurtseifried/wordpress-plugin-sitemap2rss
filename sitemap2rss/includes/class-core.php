@@ -81,101 +81,42 @@ class Core {
             }
         }
 
-        // Get alias from query var or $_GET as fallback
+        // Handle the feed request
         $alias = get_query_var('alias');
-        if (empty($alias)) {
-            // Validate and sanitize GET nonce
-            $get_nonce = isset($_GET[$this->nonce_name]) 
-                ? sanitize_text_field(wp_unslash($_GET[$this->nonce_name])) 
-                : '';
-
-            if (empty($get_nonce) || !wp_verify_nonce($get_nonce, $this->nonce_action)) {
-                wp_die(
-                    esc_html__('Security check failed.', 'sitemap2rss'),
-                    '',
-                    ['response' => 403]
-                );
-            }
-
-            // Validate and sanitize alias from GET
-            $alias = isset($_GET['alias']) 
-                ? sanitize_text_field(wp_unslash($_GET['alias'])) 
-                : '';
-        }
-
-        // Further sanitize the alias using the validator
-        $alias = $this->validator->sanitize_alias($alias);
-
-        if (!$alias) {
-            wp_die(
-                esc_html__('Invalid alias format', 'sitemap2rss'),
-                '',
-                ['response' => 400]
-            );
-        }
-
         $aliases = get_option($this->option_name, []);
+
         if (!isset($aliases[$alias])) {
             wp_die(
-                esc_html__('Invalid sitemap alias', 'sitemap2rss'),
+                esc_html__('Invalid alias.', 'sitemap2rss'),
                 '',
                 ['response' => 404]
             );
         }
 
-        if (!$this->check_rate_limit($aliases[$alias]['url'])) {
-            status_header(429);
-            $retry_after = get_option($this->rate_limit_option)['minimum_interval'];
-            header('Retry-After: ' . absint($retry_after));
+        $sitemap_url = $aliases[$alias]['url'];
+        $feed_name = $aliases[$alias]['name'];
+        $self_url = home_url(add_query_arg(null, null));
+
+        $content = wp_remote_retrieve_body(wp_remote_get($sitemap_url));
+
+        if (empty($content)) {
             wp_die(
-                esc_html__('Rate limit exceeded. Please try again later.', 'sitemap2rss'),
+                esc_html__('Failed to retrieve sitemap content.', 'sitemap2rss'),
                 '',
-                ['response' => 429]
+                ['response' => 500]
             );
         }
 
-        // Generate and output the feed
-        $this->feed_generator->generate(
-            $aliases[$alias]['url'],
-            $aliases[$alias]['name']
-        );
-        exit;
-    }
+        $urls = $this->validator->validate_sitemap_content($content);
 
-    private function check_rate_limit($sitemap_url) {
-        $rate_limits = get_option($this->rate_limit_option);
-        $hash = md5($sitemap_url);
-        
-        $last_access = get_transient("sitemap2rss_last_{$hash}");
-        if (false !== $last_access) {
-            $time_since_last = time() - $last_access;
-            if ($time_since_last < $rate_limits['minimum_interval']) {
-                return false;
-            }
+        if (!$urls['valid']) {
+            wp_die(
+                esc_html($urls['message']),
+                '',
+                ['response' => 500]
+            );
         }
 
-        $count = get_transient("sitemap2rss_count_{$hash}") ?: 0;
-        if ($count >= $rate_limits['requests_per_minute']) {
-            return false;
-        }
-
-        set_transient("sitemap2rss_count_{$hash}", $count + 1, 60);
-        set_transient("sitemap2rss_last_{$hash}", time(), 60);
-        
-        return true;
-    }
-
-    /**
-     * Helper function to generate nonce field for forms
-     */
-    public function get_nonce_field() {
-        return wp_nonce_field($this->nonce_action, $this->nonce_name, true, false);
-    }
-
-    /**
-     * Helper function to generate nonce URL
-     */
-    public function get_nonce_url($url) {
-        return wp_nonce_url($url, $this->nonce_action, $this->nonce_name);
+        $this->feed_generator->generate_feed($feed_name, $sitemap_url, $self_url, $urls['urls']);
     }
 }

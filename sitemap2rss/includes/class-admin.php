@@ -80,150 +80,87 @@ class Admin {
         return $sanitized;
     }
 
-    public function sanitize_rate_limits($limits) {
-        return [
-            'requests_per_minute' => min(60, max(1, absint($limits['requests_per_minute'] ?? 5))),
-            'minimum_interval' => min(300, max(1, absint($limits['minimum_interval'] ?? 10)))
-        ];
+    public function sanitize_rate_limits($rate_limits) {
+        if (!is_array($rate_limits)) {
+            return [];
+        }
+
+        $sanitized = [];
+        $sanitized['requests_per_minute'] = isset($rate_limits['requests_per_minute']) ? intval($rate_limits['requests_per_minute']) : 5;
+        $sanitized['minimum_interval'] = isset($rate_limits['minimum_interval']) ? intval($rate_limits['minimum_interval']) : 10;
+
+        return $sanitized;
     }
 
     public function handle_add_alias() {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('Unauthorized access', 'sitemap2rss'), '', ['response' => 403]);
+            wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'sitemap2rss'));
         }
 
         check_admin_referer('sitemap2rss_add_alias');
 
-        // Properly sanitize the alias
-        $alias = isset($_POST['alias']) ? sanitize_text_field(wp_unslash($_POST['alias'])) : '';
-        $alias = $this->validator->sanitize_alias($alias);
-        
-        if (!$alias) {
-            $this->add_admin_notice('error', __('Invalid alias format', 'sitemap2rss'));
-            wp_redirect(admin_url('options-general.php?page=sitemap2rss'));
-            exit;
-        }
-
-        // Properly sanitize the URL
-        $url = isset($_POST['url']) ? sanitize_url(wp_unslash($_POST['url'])) : '';
-        $url = $this->validator->sanitize_url($url);
-        
-        if (!$url) {
-            $this->add_admin_notice('error', __('Invalid URL format', 'sitemap2rss'));
-            wp_redirect(admin_url('options-general.php?page=sitemap2rss'));
-            exit;
-        }
-
-        $name = isset($_POST['name']) ? sanitize_text_field(wp_unslash($_POST['name'])) : $alias;
-
-        // Verify sitemap is accessible and valid
-        try {
-            $response = wp_remote_get($url, [
-                'timeout' => 15,
-                'sslverify' => true,
-            ]);
-
-            if (is_wp_error($response)) {
-                throw new \Exception($response->get_error_message());
-            }
-
-            if (wp_remote_retrieve_response_code($response) !== 200) {
-                throw new \Exception(__('Sitemap URL returned non-200 status code', 'sitemap2rss'));
-            }
-
-            $content = wp_remote_retrieve_body($response);
-            $validation = $this->validator->validate_sitemap_content($content);
-            
-            if (!$validation['valid']) {
-                throw new \Exception($validation['message']);
-            }
-
-        } catch (\Exception $e) {
-            $this->add_admin_notice('error', sprintf(
-                /* translators: %s: error message */
-                __('Sitemap validation failed: %s', 'sitemap2rss'),
-                $e->getMessage()
-            ));
-            wp_redirect(admin_url('options-general.php?page=sitemap2rss'));
-            exit;
-        }
-
         $aliases = get_option($this->option_name, []);
-        
-        if (count($aliases) >= $this->max_aliases) {
-            $this->add_admin_notice('error', __('Maximum number of aliases reached', 'sitemap2rss'));
-            wp_redirect(admin_url('options-general.php?page=sitemap2rss'));
-            exit;
+        $post_data = wp_unslash($_POST);
+        $alias = isset($post_data['alias']) ? $this->validator->sanitize_alias($post_data['alias']) : '';
+        $url = isset($post_data['url']) ? $this->validator->sanitize_url($post_data['url']) : '';
+        $name = isset($post_data['name']) ? sanitize_text_field($post_data['name']) : $alias;
+
+        if ($alias && $url) {
+            $aliases[$alias] = [
+                'name' => $name,
+                'url' => $url
+            ];
+            update_option($this->option_name, $aliases);
+            $this->add_admin_notice('alias_added', __('Alias added successfully.', 'sitemap2rss'), 'success');
+        } else {
+            $this->add_admin_notice('alias_error', __('Invalid alias or URL.', 'sitemap2rss'), 'error');
         }
 
-        $aliases[$alias] = [
-            'name' => $name,
-            'url' => $url
-        ];
-
-        update_option($this->option_name, $aliases);
-        $this->add_admin_notice('success', __('Alias added successfully', 'sitemap2rss'));
-        
         wp_redirect(admin_url('options-general.php?page=sitemap2rss'));
         exit;
     }
 
     public function handle_delete_alias() {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('Unauthorized access', 'sitemap2rss'), '', ['response' => 403]);
+            wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'sitemap2rss'));
         }
 
         check_admin_referer('sitemap2rss_delete_alias');
 
-        // Properly sanitize the alias
-        $alias = isset($_POST['alias']) ? sanitize_text_field(wp_unslash($_POST['alias'])) : '';
-        $alias = $this->validator->sanitize_alias($alias);
-        
-        if ($alias) {
-            $aliases = get_option($this->option_name, []);
+        $aliases = get_option($this->option_name, []);
+        $post_data = wp_unslash($_POST);
+        $alias = isset($post_data['alias']) ? $this->validator->sanitize_alias($post_data['alias']) : '';
+
+        if ($alias && isset($aliases[$alias])) {
             unset($aliases[$alias]);
             update_option($this->option_name, $aliases);
-            $this->add_admin_notice('success', __('Alias deleted successfully', 'sitemap2rss'));
+            $this->add_admin_notice('alias_deleted', __('Alias deleted successfully.', 'sitemap2rss'), 'success');
+        } else {
+            $this->add_admin_notice('alias_error', __('Invalid alias.', 'sitemap2rss'), 'error');
         }
 
         wp_redirect(admin_url('options-general.php?page=sitemap2rss'));
         exit;
     }
 
-    private function add_admin_notice($type, $message) {
-        $notices = get_transient('sitemap2rss_admin_notices') ?: [];
-        $notices[] = [
-            'type' => $type,
-            'message' => $message
-        ];
-        set_transient('sitemap2rss_admin_notices', $notices, 45);
+    public function display_admin_notices() {
+        if ($notice = get_transient('sitemap2rss_admin_notice')) {
+            echo '<div class="notice notice-' . esc_attr($notice['type']) . ' is-dismissible">';
+            echo '<p>' . esc_html($notice['message']) . '</p>';
+            echo '</div>';
+            delete_transient('sitemap2rss_admin_notice');
+        }
     }
 
-    public function display_admin_notices() {
-        $notices = get_transient('sitemap2rss_admin_notices');
-        if (!$notices) {
-            return;
-        }
-
-        foreach ($notices as $notice) {
-            printf(
-                '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>',
-                esc_attr($notice['type']),
-                esc_html($notice['message'])
-            );
-        }
-
-        delete_transient('sitemap2rss_admin_notices');
+    private function add_admin_notice($key, $message, $type = 'info') {
+        set_transient('sitemap2rss_admin_notice', [
+            'key' => $key,
+            'message' => $message,
+            'type' => $type
+        ], 30);
     }
 
     public function render_admin_page() {
-        if (!current_user_can('manage_options')) {
-            return;
-        }
-
-        $aliases = get_option($this->option_name, []);
-        $rate_limits = get_option($this->rate_limit_option);
-
-        require_once SITEMAP2RSS_PLUGIN_DIR . 'admin/views/settings-page.php';
+        include SITEMAP2RSS_PLUGIN_DIR . 'templates/admin-page.php';
     }
 }

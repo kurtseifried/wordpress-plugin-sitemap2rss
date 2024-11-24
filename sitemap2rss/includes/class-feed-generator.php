@@ -79,13 +79,21 @@ class FeedGenerator {
         return $content;
     }
 
-    private function parse_sitemap($content) {
+    public function parse_sitemap($content) {
         libxml_use_internal_errors(true);
-        $prev = libxml_disable_entity_loader(true);
+        $prev = libxml_set_external_entity_loader(function($public, $system, $context) {
+            return null;
+        });
 
         try {
             $xml = new \DOMDocument();
-            $xml->loadXML($content, LIBXML_NONET | LIBXML_NOCDATA);
+            $loaded = $xml->loadXML($content, LIBXML_NONET | LIBXML_NOCDATA);
+
+            if (!$loaded) {
+                $errors = libxml_get_errors();
+                libxml_clear_errors();
+                throw new \Exception(__('Failed to load XML', 'sitemap2rss'));
+            }
 
             $urls = [];
             $url_elements = $xml->getElementsByTagName('url');
@@ -134,23 +142,16 @@ class FeedGenerator {
                 )
             );
         } finally {
-            libxml_disable_entity_loader($prev);
+            libxml_set_external_entity_loader($prev);
             libxml_use_internal_errors(false);
         }
     }
 
     private function output_feed($urls, $feed_name, $sitemap_url, $self_url) {
-        // Set security headers
-        header('X-Content-Type-Options: nosniff');
-        header('X-Frame-Options: DENY');
-        header('Content-Security-Policy: default-src \'none\'; frame-ancestors \'none\'');
-        header('Content-Type: application/rss+xml; charset=UTF-8');
+        $this->generate_feed($feed_name, $sitemap_url, $self_url, $urls);
+    }
 
-        // Clear any previous output and turn off output buffering
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-
+    public function generate_feed($feed_name, $sitemap_url, $self_url, $urls) {
         // Create XML document
         $doc = new \DOMDocument('1.0', 'UTF-8');
         $doc->formatOutput = true;
@@ -222,7 +223,8 @@ class FeedGenerator {
         }
 
         // Output with specific options
-        echo $doc->saveXML($doc->documentElement, LIBXML_NOEMPTYTAG);
+        $xml_output = $doc->saveXML($doc->documentElement, LIBXML_NOEMPTYTAG);
+        echo wp_kses_post($xml_output);
         exit;
     }
 }

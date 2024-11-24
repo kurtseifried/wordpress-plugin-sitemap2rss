@@ -79,33 +79,27 @@ if (!isset($aliases) || !isset($rate_limits) || !isset($this->rate_limit_option)
                            name="alias" 
                            id="alias" 
                            class="regular-text code"
-                           pattern="[a-z0-9\-]+" 
-                           required
-                           maxlength="50"
-                           title="<?php esc_attr_e('Only lowercase letters, numbers, and hyphens allowed', 'sitemap2rss'); ?>"
-                           placeholder="<?php esc_attr_e('e.g., my-sitemap', 'sitemap2rss'); ?>" />
+                           pattern="[a-z0-9\-]+"
+                           required />
                     <p class="description">
-                        <?php esc_html_e('Used in URL: sitemap2rss/?alias=your-alias', 'sitemap2rss'); ?>
-                        <br>
-                        <?php esc_html_e('3-50 characters, lowercase letters, numbers, and hyphens only.', 'sitemap2rss'); ?>
+                        <?php esc_html_e('The alias to be used in the feed URL.', 'sitemap2rss'); ?>
                     </p>
                 </td>
             </tr>
             <tr>
                 <th scope="row">
                     <label for="name">
-                        <?php esc_html_e('Display Name', 'sitemap2rss'); ?>
+                        <?php esc_html_e('Name', 'sitemap2rss'); ?>
                     </label>
                 </th>
                 <td>
                     <input type="text" 
                            name="name" 
                            id="name" 
-                           class="regular-text"
-                           maxlength="100"
-                           placeholder="<?php esc_attr_e('e.g., Tech Page', 'sitemap2rss'); ?>" />
+                           class="regular-text" 
+                           required />
                     <p class="description">
-                        <?php esc_html_e('A friendly name for your feed. If left empty, the alias will be used.', 'sitemap2rss'); ?>
+                        <?php esc_html_e('The name of the sitemap.', 'sitemap2rss'); ?>
                     </p>
                 </td>
             </tr>
@@ -120,104 +114,49 @@ if (!isset($aliases) || !isset($rate_limits) || !isset($this->rate_limit_option)
                     <input type="url" 
                            name="url" 
                            id="url" 
-                           class="regular-text code"
-                           required
-                           maxlength="2083"
-                           placeholder="<?php esc_attr_e('https://example.com/sitemap.xml', 'sitemap2rss'); ?>" />
+                           class="regular-text code" 
+                           required />
                     <p class="description">
-                        <?php esc_html_e('The full URL of your XML sitemap. Must be accessible and contain valid sitemap data.', 'sitemap2rss'); ?>
+                        <?php esc_html_e('The URL of the sitemap to be converted.', 'sitemap2rss'); ?>
                     </p>
                 </td>
             </tr>
         </table>
-
         <?php submit_button(__('Add Sitemap Alias', 'sitemap2rss')); ?>
     </form>
 
-    <h2><?php esc_html_e('Existing Aliases', 'sitemap2rss'); ?></h2>
-    <?php if (empty($aliases)): ?>
-        <div class="notice notice-warning inline">
-            <p><?php esc_html_e('No aliases configured yet. Add your first sitemap alias using the form above.', 'sitemap2rss'); ?></p>
-        </div>
-    <?php else: ?>
-        <table class="wp-list-table widefat fixed striped">
-            <thead>
-                <tr>
-                    <th scope="col" class="column-primary"><?php esc_html_e('Alias', 'sitemap2rss'); ?></th>
-                    <th scope="col"><?php esc_html_e('Name', 'sitemap2rss'); ?></th>
-                    <th scope="col"><?php esc_html_e('Sitemap URL', 'sitemap2rss'); ?></th>
-                    <th scope="col"><?php esc_html_e('RSS Feed URL', 'sitemap2rss'); ?></th>
-                    <th scope="col"><?php esc_html_e('Actions', 'sitemap2rss'); ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($aliases as $alias => $data): 
-                    $feed_url = add_query_arg(
-                        ['alias' => urlencode($alias)],
-                        home_url('/sitemap2rss/')
-                    );
-                ?>
+    <h2><?php esc_html_e('Existing Sitemap Aliases', 'sitemap2rss'); ?></h2>
+    <table class="wp-list-table widefat fixed striped">
+        <thead>
+            <tr>
+                <th><?php esc_html_e('Alias', 'sitemap2rss'); ?></th>
+                <th><?php esc_html_e('Name', 'sitemap2rss'); ?></th>
+                <th><?php esc_html_e('URL', 'sitemap2rss'); ?></th>
+                <th><?php esc_html_e('Actions', 'sitemap2rss'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($aliases)) : ?>
+                <?php foreach ($aliases as $alias => $data) : ?>
                     <tr>
-                        <td class="column-primary">
-                            <strong><?php echo esc_html($alias); ?></strong>
-                            <button type="button" class="toggle-row">
-                                <span class="screen-reader-text">
-                                    <?php esc_html_e('Show more details', 'sitemap2rss'); ?>
-                                </span>
-                            </button>
-                        </td>
-                        <td data-colname="<?php esc_attr_e('Name', 'sitemap2rss'); ?>">
-                            <?php echo esc_html($data['name']); ?>
-                        </td>
-                        <td data-colname="<?php esc_attr_e('Sitemap URL', 'sitemap2rss'); ?>">
-                            <code class="sitemap-url"><?php echo esc_url($data['url']); ?></code>
-                        </td>
-                        <td data-colname="<?php esc_attr_e('RSS Feed URL', 'sitemap2rss'); ?>">
-                            <code class="feed-url"><?php echo esc_url($feed_url); ?></code>
-                            <button type="button" 
-                                    class="button button-small copyurl" 
-                                    data-clipboard-text="<?php echo esc_attr($feed_url); ?>">
-                                <?php esc_html_e('Copy URL', 'sitemap2rss'); ?>
-                            </button>
-                        </td>
-                        <td data-colname="<?php esc_attr_e('Actions', 'sitemap2rss'); ?>">
-                            <form method="post" 
-                                  action="<?php echo esc_url(admin_url('admin-post.php')); ?>" 
-                                  style="display:inline;">
+                        <td><?php echo esc_html($alias); ?></td>
+                        <td><?php echo esc_html($data['name']); ?></td>
+                        <td><?php echo esc_url($data['url']); ?></td>
+                        <td>
+                            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                                 <input type="hidden" name="action" value="delete_sitemap_alias" />
-                                <input type="hidden" name="alias" value="<?php echo esc_attr($alias); ?>" />
                                 <?php wp_nonce_field('sitemap2rss_delete_alias'); ?>
-                                <button type="submit" 
-                                        class="button button-small button-link-delete"
-                                        onclick="return confirm('<?php echo esc_js(sprintf(
-                                            /* translators: %s: alias name */
-                                            __('Are you sure you want to delete the alias "%s"?', 'sitemap2rss'),
-                                            $alias
-                                        )); ?>')">
-                                    <?php esc_html_e('Delete', 'sitemap2rss'); ?>
-                                </button>
+                                <input type="hidden" name="alias" value="<?php echo esc_attr($alias); ?>" />
+                                <?php submit_button(__('Delete', 'sitemap2rss'), 'delete', '', false); ?>
                             </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php endif; ?>
+            <?php else : ?>
+                <tr>
+                    <td colspan="4"><?php esc_html_e('No aliases found.', 'sitemap2rss'); ?></td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
 </div>
-
-<script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.copyurl').forEach(function(button) {
-        button.addEventListener('click', function() {
-            const url = this.getAttribute('data-clipboard-text');
-            navigator.clipboard.writeText(url).then(function() {
-                const originalText = button.textContent;
-                button.textContent = '<?php echo esc_js(__('Copied!', 'sitemap2rss')); ?>';
-                setTimeout(function() {
-                    button.textContent = originalText;
-                }, 2000);
-            });
-        });
-    });
-});
-</script>
