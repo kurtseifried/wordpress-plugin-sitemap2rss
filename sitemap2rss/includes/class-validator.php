@@ -66,12 +66,12 @@ class Validator {
         if (empty($content)) {
             return [
                 'valid' => false,
-                'message' => __('Empty sitemap content', 'sitemap2rss')
+                'message' => __('Empty sitemap content', 'sitemap2rss'),
+                'urls' => []
             ];
         }
 
         libxml_use_internal_errors(true);
-        // Use libxml_set_external_entity_loader to control external entity loading
         $prev = libxml_set_external_entity_loader(function($public, $system, $context) {
             return null;
         });
@@ -85,21 +85,64 @@ class Validator {
                 libxml_clear_errors();
                 return [
                     'valid' => false,
-                    'message' => __('Invalid XML content', 'sitemap2rss')
+                    'message' => __('Invalid XML content', 'sitemap2rss'),
+                    'urls' => []
                 ];
             }
+
+            $urls = [];
+            $url_elements = $xml->getElementsByTagName('url');
+
+            foreach ($url_elements as $url_element) {
+                $url_data = [
+                    'loc' => '',
+                    'lastmod' => '',
+                    'changefreq' => '',
+                    'priority' => ''
+                ];
+
+                foreach ($url_data as $field => &$value) {
+                    $nodes = $url_element->getElementsByTagName($field);
+                    if ($nodes->length > 0) {
+                        $value = $nodes->item(0)->nodeValue;
+                    }
+                }
+
+                if (!$this->validate_url($url_data['loc'])) {
+                    continue;
+                }
+
+                if (!empty($url_data['lastmod'])) {
+                    $timestamp = strtotime($url_data['lastmod']);
+                    if ($timestamp === false) {
+                        $url_data['lastmod'] = '';
+                    }
+                }
+
+                $urls[] = $url_data;
+            }
+
+            if (empty($urls)) {
+                return [
+                    'valid' => false,
+                    'message' => __('No valid URLs found in sitemap', 'sitemap2rss'),
+                    'urls' => []
+                ];
+            }
+
+            return [
+                'valid' => true,
+                'message' => __('Valid sitemap content', 'sitemap2rss'),
+                'urls' => $urls
+            ];
+
         } finally {
-            // Validate $prev before restoring the entity loader
-            if (is_callable($prev) || $prev === null) {
+            if (is_callable($prev)) {
                 libxml_set_external_entity_loader($prev);
             } else {
-                libxml_set_external_entity_loader(null); // Safeguard to reset to default
+                libxml_set_external_entity_loader(null);
             }
+            libxml_use_internal_errors(false);
         }
-
-        return [
-            'valid' => true,
-            'message' => __('Valid sitemap content', 'sitemap2rss')
-        ];
     }
 }

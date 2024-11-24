@@ -27,7 +27,13 @@ class FeedGenerator {
             }
             
             $sitemap_content = $this->fetch_sitemap($sitemap_url);
-            $urls = $this->parse_sitemap($sitemap_content);
+            $result = $this->validator->validate_sitemap_content($sitemap_content);
+
+            if (!$result['valid']) {
+                throw new \Exception($result['message']);
+            }
+
+            $urls = $result['urls'];
             $this->output_feed($urls, $feed_name, $sitemap_url, $self_url);
         } catch (\Exception $e) {
             do_action('sitemap2rss_error', $e->getMessage(), [
@@ -69,14 +75,7 @@ class FeedGenerator {
             );
         }
 
-        $content = wp_remote_retrieve_body($response);
-        
-        $validation = $this->validator->validate_sitemap_content($content);
-        if (!$validation['valid']) {
-            throw new \Exception(esc_html($validation['message']));
-        }
-
-        return $content;
+        return wp_remote_retrieve_body($response);
     }
 
     public function parse_sitemap($content) {
@@ -226,10 +225,29 @@ class FeedGenerator {
             $channel->appendChild($item);
         }
 
-        // Output with specific options
+        // Generate the XML output with specific options
         $xml_output = $doc->saveXML($doc->documentElement, LIBXML_NOEMPTYTAG);
+
+        // Validate the XML output
+        if ($xml_output === false) {
+            // Handle the error gracefully
+            header('Content-Type: text/plain; charset=UTF-8', true, 500);
+            echo 'Error generating XML feed.';
+            exit;
+        }
+
+        // Set the correct Content-Type header for RSS/XML
         header('Content-Type: application/rss+xml; charset=UTF-8');
+
+        // Disable any additional output buffering
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        // Output the XML content directly
         echo $xml_output;
+
+        // Terminate the script to ensure no further output
         exit;
     }
 }
