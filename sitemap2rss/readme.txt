@@ -3,7 +3,7 @@ Contributors: kurtseifried
 Tags: sitemap, rss, feed, converter, xml
 Requires at least: 6.6.2
 Tested up to: 6.7.1
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -61,7 +61,10 @@ For security reasons, sitemaps must be pre-configured through the admin interfac
 = 1.0.5 =
 * Fixed deprecated functions and general improvements
 
+= 1.0.6 =
+* Fixed XML output, CSS, Javascript, numerous errors
+
 == Upgrade Notice ==
 
-= 1.0.5 =
-* Fixed deprecated functions and general improvements
+= 1.0.6 =
+* Fixed XML output, CSS, Javascript, numerous errors
