@@ -163,19 +163,3 @@ if (!isset($aliases) || !isset($rate_limits) || !isset($rate_limit_option)) {
         </tbody>
     </table>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const copyButtons = document.querySelectorAll('.copy-url');
-    copyButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const url = this.getAttribute('data-url');
-            navigator.clipboard.writeText(url).then(() => {
-                alert('<?php esc_html_e('URL copied to clipboard', 'sitemap2rss'); ?>');
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-            });
-        });
-    });
-});
-</script>

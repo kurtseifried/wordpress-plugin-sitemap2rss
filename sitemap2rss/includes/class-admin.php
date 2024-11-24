@@ -22,6 +22,7 @@ class Admin {
         add_action('admin_post_add_sitemap_alias', [$this, 'handle_add_alias']);
         add_action('admin_post_delete_sitemap_alias', [$this, 'handle_delete_alias']);
         add_action('admin_notices', [$this, 'display_admin_notices']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
     }
 
     public function add_admin_menu() {
@@ -169,5 +170,15 @@ class Admin {
         $rate_limit_option = $this->rate_limit_option;
 
         include SITEMAP2RSS_PLUGIN_DIR . 'admin/views/settings-page.php';
+    }
+
+    public function enqueue_admin_assets($hook_suffix) {
+        if ($hook_suffix === 'settings_page_sitemap2rss') {
+            wp_register_script('sitemap2rss-admin-script', plugins_url('assets/admin-script.js', __FILE__), ['jquery'], SITEMAP2RSS_VERSION, true);
+            wp_enqueue_script('sitemap2rss-admin-script');
+
+            wp_register_style('sitemap2rss-admin-style', plugins_url('assets/admin-style.css', __FILE__), [], SITEMAP2RSS_VERSION);
+            wp_enqueue_style('sitemap2rss-admin-style');
+        }
     }
 }
