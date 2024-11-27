@@ -1,0 +1,21 @@
+/* Basic styles for the admin page */
+.wrap .form-table th {
+    width: 200px;
+}
+
+.wrap .form-table td {
+    vertical-align: top;
+}
+
+.wrap .form-table .description {
+    color: #666;
+    font-size: 13px;
+}
+
+.wrap .wp-list-table th, .wrap .wp-list-table td {
+    padding: 10px;
+}
+
+.wrap .wp-list-table .button.copy-url {
+    margin-left: 10px;
+}
