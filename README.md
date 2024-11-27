@@ -4,7 +4,7 @@
 * Tags: sitemap, rss, feed, converter, xml
 * Requires at least: 5.0
 * Tested up to: 6.4
-* Stable tag: 1.0.6
+* Stable tag: 1.0.6  
 * Requires PHP: 7.2
 * License: GPLv2 or later
 * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -46,7 +46,7 @@ For security reasons, sitemaps must be pre-configured through the admin interfac
 1. Admin interface for managing sitemap aliases
 2. Example of RSS output
 
-![Admin interface for managing sitemap aliases](images/sitemap2rss-settings.png)
+![Admin interface for managing sitemap aliases](assets/sitemap2rss-settings.png)
 
-![Example of RSS output](images/sitemap2rss-output.png)
+![Example of RSS output](assets/sitemap2rss-output.png)
 
