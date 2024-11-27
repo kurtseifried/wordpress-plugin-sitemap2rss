@@ -6,7 +6,7 @@
  * Version: 1.0.6
  * Requires at least: 6.6.2
  * Requires PHP: 7.2
- * Author: Your Name
+ * Author: Kurt Seifried
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: sitemap2rss
