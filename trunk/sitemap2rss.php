@@ -3,7 +3,7 @@
  * Plugin Name: sitemap2rss
  * Plugin URI: https://github.com/kurtseifried/wordpress-plugin-sitemap2rss
  * Description: Convert XML sitemaps into RSS feeds using predefined aliases.
- * Version: 1.0.6
+ * Version: 1.0.7
  * Requires at least: 6.6.2
  * Requires PHP: 7.2
  * Author: Kurt Seifried

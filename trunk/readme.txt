@@ -3,7 +3,7 @@ Contributors: kurtseifried
 Tags: sitemap, rss, feed, converter, xml
 Requires at least: 6.6.2
 Tested up to: 6.7.1
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -23,18 +23,18 @@ Features:
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/sitemap-to-rss` directory, or install the plugin through the WordPress plugins screen directly.
-2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Use the Settings->Sitemap to RSS screen to add your sitemap aliases.
-4. Access your feeds using your-site.com/sitemap2rss/?alias=your-alias.
+1. Upload the plugin files to the `/wp-content/plugins/sitemap2rss` directory, or install the plugin through the WordPress plugins screen directly
+2. Activate the plugin through the 'Plugins' screen in WordPress
+3. Use the "Settings"->"Sitemap to RSS" screen to add your sitemap aliases
+4. Access your feeds using your-site.com/sitemap2rss/your-alias
 
 == Frequently Asked Questions ==
 
 = How do I create a new RSS feed? =
 
-1. Go to Settings->Sitemap to RSS in your WordPress admin.
+1. Go to "Settings"->"Sitemap to RSS" in your WordPress admin.
 2. Add a new sitemap with an alias and URL.
-3. Access your feed at your-site.com/sitemap2rss/?alias=your-alias.
+3. Access your feed at your-site.com/sitemap2rss/your-alias.
 
 = Can I convert any sitemap to RSS? =
 
@@ -64,7 +64,11 @@ For security reasons, sitemaps must be pre-configured through the admin interfac
 = 1.0.6 =
 * Fixed XML output, CSS, Javascript, numerous errors
 
+= 1.0.7 =
+* Fixed documentation
+
 == Upgrade Notice ==
 
-= 1.0.6 =
-* Fixed XML output, CSS, Javascript, numerous errors
+= 1.0.7 =
+* Fixed documentation
+
