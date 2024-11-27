@@ -1,0 +1,213 @@
+# Copyright (C) 2024 Kurt Seifried
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: sitemap2rss 1.0.8\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/trunk\n"
+"Last-Translator: Kurt Seifried <kurt@seifried.org>\n"
+"Language-Team: English (Canada) <en_CA@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2024-11-26T22:38:14-07:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: sitemap2rss\n"
+
+#. Plugin Name of the plugin
+#: sitemap2rss.php
+msgid "sitemap2rss"
+msgstr "sitemap2rss"
+
+#. Plugin URI of the plugin
+#: sitemap2rss.php
+msgid "https://github.com/kurtseifried/wordpress-plugin-sitemap2rss"
+msgstr "https://github.com/kurtseifried/wordpress-plugin-sitemap2rss"
+
+#. Description of the plugin
+#: sitemap2rss.php
+msgid "Convert XML sitemaps into RSS feeds using predefined aliases."
+msgstr "Convert XML sitemaps into RSS feeds using predefined aliases."
+
+#. Author of the plugin
+#: sitemap2rss.php
+msgid "Kurt Seifried"
+msgstr "Kurt Seifried"
+
+#: admin/views/settings-page.php:8
+msgid "Invalid configuration"
+msgstr "Invalid configuration"
+
+#: admin/views/settings-page.php:12
+msgid "Sitemap to RSS Converter"
+msgstr "Sitemap to RSS Converter"
+
+#: admin/views/settings-page.php:16
+msgid "Configure sitemaps to be converted into RSS feeds. Each sitemap needs an alias that will be used in the feed URL."
+msgstr "Configure sitemaps to be converted into RSS feeds. Each sitemap needs an alias that will be used in the feed URL."
+
+#: admin/views/settings-page.php:20
+msgid "Rate Limit Settings"
+msgstr "Rate Limit Settings"
+
+#: admin/views/settings-page.php:27
+msgid "Requests Per Minute"
+msgstr "Requests Per Minute"
+
+#: admin/views/settings-page.php:38
+msgid "Maximum number of requests allowed per minute for each sitemap."
+msgstr "Maximum number of requests allowed per minute for each sitemap."
+
+#: admin/views/settings-page.php:45
+msgid "Minimum Interval (seconds)"
+msgstr "Minimum Interval (seconds)"
+
+#: admin/views/settings-page.php:56
+msgid "Minimum time (in seconds) between requests to the same sitemap."
+msgstr "Minimum time (in seconds) between requests to the same sitemap."
+
+#: admin/views/settings-page.php:61
+msgid "Save Rate Limit Settings"
+msgstr "Save Rate Limit Settings"
+
+#: admin/views/settings-page.php:64
+msgid "Add New Sitemap Alias"
+msgstr "Add New Sitemap Alias"
+
+#: admin/views/settings-page.php:73
+#: admin/views/settings-page.php:132
+msgid "Alias"
+msgstr "Alias"
+
+#: admin/views/settings-page.php:85
+msgid "The alias to be used in the feed URL."
+msgstr "The alias to be used in the feed URL."
+
+#: admin/views/settings-page.php:92
+#: admin/views/settings-page.php:133
+msgid "Name"
+msgstr "Name"
+
+#: admin/views/settings-page.php:102
+msgid "The name of the sitemap."
+msgstr "The name of the sitemap."
+
+#: admin/views/settings-page.php:109
+msgid "Sitemap URL"
+msgstr "Sitemap URL"
+
+#: admin/views/settings-page.php:120
+msgid "The URL of the sitemap to be converted."
+msgstr "The URL of the sitemap to be converted."
+
+#: admin/views/settings-page.php:125
+msgid "Add Sitemap Alias"
+msgstr "Add Sitemap Alias"
+
+#: admin/views/settings-page.php:128
+msgid "Existing Sitemap Aliases"
+msgstr "Existing Sitemap Aliases"
+
+#: admin/views/settings-page.php:134
+msgid "URL"
+msgstr "URL"
+
+#: admin/views/settings-page.php:135
+msgid "Actions"
+msgstr "Actions"
+
+#: admin/views/settings-page.php:150
+msgid "Delete"
+msgstr "Delete"
+
+#: admin/views/settings-page.php:157
+msgid "No aliases found."
+msgstr "No aliases found."
+
+#: includes/class-admin.php:30
+#: includes/class-admin.php:31
+msgid "Sitemap to RSS"
+msgstr "Sitemap to RSS"
+
+#: includes/class-admin.php:98
+#: includes/class-admin.php:126
+msgid "You do not have sufficient permissions to access this page."
+msgstr "You do not have sufficient permissions to access this page."
+
+#: includes/class-admin.php:115
+msgid "Alias added successfully."
+msgstr "Alias added successfully."
+
+#: includes/class-admin.php:117
+msgid "Invalid alias or URL."
+msgstr "Invalid alias or URL."
+
+#: includes/class-admin.php:138
+msgid "Alias deleted successfully."
+msgstr "Alias deleted successfully."
+
+#: includes/class-admin.php:140
+#: includes/class-core.php:90
+msgid "Invalid alias."
+msgstr "Invalid alias."
+
+#: includes/class-core.php:77
+msgid "Security check failed."
+msgstr "Security check failed."
+
+#: includes/class-core.php:104
+msgid "Failed to retrieve sitemap content."
+msgstr "Failed to retrieve sitemap content."
+
+#: includes/class-feed-generator.php:46
+msgid "Feed Generation Error"
+msgstr "Feed Generation Error"
+
+#. translators: %s: error message from WordPress
+#: includes/class-feed-generator.php:62
+msgid "Failed to fetch sitemap: %s"
+msgstr "Failed to fetch sitemap: %s"
+
+#. translators: %d: HTTP response code
+#: includes/class-feed-generator.php:72
+msgid "Sitemap returned HTTP error: %d"
+msgstr "Sitemap returned HTTP error: %d"
+
+#: includes/class-feed-generator.php:94
+msgid "Failed to load XML"
+msgstr "Failed to load XML"
+
+#: includes/class-feed-generator.php:130
+#: includes/class-validator.php:128
+msgid "No valid URLs found in sitemap"
+msgstr "No valid URLs found in sitemap."
+
+#. translators: %s: error message
+#: includes/class-feed-generator.php:139
+msgid "Failed to parse sitemap: %s"
+msgstr "Failed to parse sitemap: %s"
+
+#. translators: %s: feed name
+#: includes/class-feed-generator.php:179
+msgid "RSS feed generated from %s"
+msgstr "RSS feed generated from %s"
+
+#: includes/class-validator.php:69
+msgid "Empty sitemap content"
+msgstr "Empty sitemap content"
+
+#: includes/class-validator.php:88
+msgid "Invalid XML content"
+msgstr "Invalid XML content"
+
+#: includes/class-validator.php:135
+msgid "Valid sitemap content"
+msgstr "Valid sitemap content"
+
+#: sitemap2rss.php:39
+msgid "This plugin requires PHP 7.2 or higher."
+msgstr "This plugin requires PHP 7.2 or higher."
+
+#: sitemap2rss.php:40
+msgid "Plugin Activation Error"
+msgstr "Plugin Activation Error"
