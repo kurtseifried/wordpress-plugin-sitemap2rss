@@ -3,7 +3,7 @@ Contributors: kurtseifried
 Tags: sitemap, rss, feed, converter, xml
 Requires at least: 6.6.2
 Tested up to: 6.7.1
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html

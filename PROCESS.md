@@ -18,6 +18,11 @@ Then cut a new .pot file and update .po files as needed
 ```
 wp i18n make-pot . languages/sitemap2rss.pot
 
+for i in *; do sed 's/sitemap2rss 1\.0\.9/sitemap2rss 1.0.10/' "$i" > "$i.2"; mv -f "$i.2" "$i"; done
+
+rm *.mo
+
+../../utils/convert-translation-files-po-to-mo.sh
 ```
 
 ### Cut a new release in GitHub
