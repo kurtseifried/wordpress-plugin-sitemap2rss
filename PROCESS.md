@@ -1,6 +1,8 @@
 # Cutting a new release
 
-Update the files:
+## Updating the code and data in GitHub
+
+### Update the files:
 
 ```
 README.md
@@ -11,23 +13,39 @@ trunk/sitemap2rss.php SITEMAP2RSS_VERSION
 
 Then cut a new .pot file and update .po files as needed
 
-# Translating
+### Translating
 
 ```
 wp i18n make-pot . languages/sitemap2rss.pot
+
 ```
+
+### Cut a new release in GitHub
+
+1. https://github.com/kurtseifried/wordpress-plugin-sitemap2rss/releases
+2. Click "Draft a new release"
+3. Click "Choose a tag"
+4. Type in the new version e.g. "v1.2.3"
+5. Click "Create new tag"
+6. Describe the release in title and notes
+7. Click "Publish Release"
+
 
 # SVN Synchronizing from Github repo
 
-```
-rsync -av ~GitHub/wordpress-plugin-sitemap2rss/assets/ ./assets/
-rsync -av ~GitHub/wordpress-plugin-sitemap2rss/tags/ ./tags/
-rsync -av ~GitHub/wordpress-plugin-sitemap2rss/trunk/ ./trunk/
-```
-
-# SVN Adding all files
+## Make a new tag directory and synch the files over:
 
 ```
+mkdir mkdir ~/GitHub/sitemap2rss/tags/NEW-RELEASE-NUMBER
+rsync -av ~/GitHub/wordpress-plugin-sitemap2rss/assets/ ~/GitHub/sitemap2rss/assets/
+rsync -av ~/GitHub/wordpress-plugin-sitemap2rss/trunk ~/GitHub/sitemap2rss/tags/NEW-RELEASE-NUMBER
+rsync -av ~/GitHub/wordpress-plugin-sitemap2rss/trunk/ ~/GitHub/sitemap2rss/trunk/
+```
+
+## SVN Adding all files
+
+```
+svn stat
 svn add *
 svn add */*
 ```
