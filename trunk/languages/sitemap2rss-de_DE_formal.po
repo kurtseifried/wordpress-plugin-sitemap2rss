@@ -2,7 +2,7 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: sitemap2rss 1.0.8\n"
+"Project-Id-Version: sitemap2rss 1.0.9\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/trunk\n"
 "Last-Translator: Kurt Seifried <kurt@seifried.org>\n"
 "Language-Team: German (Formal) <de@li.org>\n"

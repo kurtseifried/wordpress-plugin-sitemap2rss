@@ -3,8 +3,10 @@
 Update the files:
 
 ```
-readme.txt
-sitemap2rss.php
+README.md
+trunk/readme.txt
+trunk/sitemap2rss.php
+trunk/sitemap2rss.php SITEMAP2RSS_VERSION
 ```
 
 Then cut a new .pot file and update .po files as needed
