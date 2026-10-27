@@ -1,5 +1,7 @@
 # Sitemap to RSS Converter
 
+> **Repository tier: 2 (keep).** Active work. Review before deleting or archiving. Labeled 2026-10-26.
+
 * Contributors: kurtseifried
 * Tags: sitemap, rss, feed, converter, xml
 * Requires at least: 5.0
